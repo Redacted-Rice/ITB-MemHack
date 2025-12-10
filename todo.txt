@@ -1,1 +1,11 @@
-... Everything
+Add struct handling logic/framework
+Add tests/test support (see memedit?)
+Make things extensible (both struct defs and tests)
+
+Future:
+Integrate with -dll repo
+Write release and install instructions
+Create as a bundled extension folder to prepare for pilot skills ext as well
+Add dynamic scanning capabilities for all accessible memory (see memedit scan/scanner)
+	Include negate scans
+	Include value changed scans?
