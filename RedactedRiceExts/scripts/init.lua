@@ -1,8 +1,11 @@
-local extension = {
-	id = "redactedrice_memhack",
-	name = "MemHack",
-	icon = "img/icon.png",
+
+local extension =  {
+	id = "redactedrice_exts",
+	name = "Redacted Rice Extensions",
 	version = "0.1.0",
+	icon = "scripts/icon.png",
+	description = "Extensions to support mods made by Redacted Rice",
+	submodFolders = {"exts/"},
 	modApiVersion = "2.9.4",
 	gameVersion = "1.2.93",
 	dependencies = {
@@ -10,23 +13,18 @@ local extension = {
         memedit = "1.2.0",
     },
 	isExtension = true,
-	enabled = false,
 }
 
 function extension:metadata()
+	-- nothing for now
 end
 
 function extension:init(options)
-	local path = self.resourcePath
-
-	require(path.."memhack")
-	require(path.."functions/pawn")
-	require(path.."functions/pilot")
-
-	memhack:init()
+	-- nothing for now
 end
 
 function extension:load(options, version)
+	-- nothing for now
 end
 
 return extension
