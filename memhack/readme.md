@@ -23,4 +23,6 @@ compatible with:
 In progress...
 
 # Install
+Unzip
 Place in the "Into the Breach/extensions" folder (create it if its not present)
+Make sure there is not additional layers of folders - if you enter memhack folder, you should see scripts folder

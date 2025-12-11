@@ -21,3 +21,7 @@ compatible with:
 
 ### Notes
 In progress...
+
+# Releases
+Build memhack-dll (if changed) and copy to memhack/memhack.dll
+Zip memhack folder and distribute it
