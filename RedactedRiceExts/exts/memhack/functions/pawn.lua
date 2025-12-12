@@ -6,7 +6,7 @@ function onPawnClassInitialized(BoardPawn, pawn)
 		-- the wrapper class around pilot - maybe an AE pilot struct?
 		local pilotPtr = memhack.dll.memory.readPointer(memhack.dll.memory.getUserdataAddr(self) + 0x984)
 		-- If no pilot, address will be set to 0
-		if pilotPtr == 0 then
+		if pilotPtr == nil or pilotPtr == 0 then
 			return nil
 		end
 		return memhack.structs.Pilot.new(pilotPtr)
