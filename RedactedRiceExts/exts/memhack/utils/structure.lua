@@ -346,16 +346,25 @@ local function addInstanceMethods(StructType, layout)
 end
 
 -- Add static methods to structure type
+-- Don't use "Get..." to avoid conflicting with defined types
 local function addStaticMethods(StructType, name, layout)
 	-- Constructor
 	function StructType.new(address)
 		local instance = setmetatable({}, StructType)
 		instance._address = address
+
+		-- If a source table is provided, copy its entries
+		if StructType then
+			for k, v in pairs(StructType) do
+				instance[k] = v
+			end
+		end
+
 		return instance
 	end
 
 	-- Calculate structure size
-	function StructType.getSize()
+	function StructType.StructSize()
 		local maxOffset = 0
 		local maxSize = 0
 
@@ -377,12 +386,12 @@ local function addStaticMethods(StructType, name, layout)
 	end
 
 	-- Get layout definition
-	function StructType.getLayout()
+	function StructType.StructLayout()
 		return layout
 	end
 
 	-- Get structure name
-	function StructType.getName()
+	function StructType.StructName()
 		return name
 	end
 end
@@ -447,7 +456,7 @@ end
 function Structure.array(structType, baseAddress, count, stride)
 	local arr = {}
 
-	local structSize = stride or structType.getSize()
+	local structSize = stride or structType.StructSize()
 	if not structSize then
 		error("Cannot create array: structure size unknown. Provide 'stride' parameter.")
 	end

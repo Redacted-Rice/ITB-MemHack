@@ -6,6 +6,31 @@
 static bool READ_ONLY = false;
 static bool READ_WRITE = true;
 
+int get_userdata_addr(lua_State* L) {
+	//luaL_checktype(L, index, LUA_TUSERDATA);
+	//userdata = (void***)lua_touserdata(L, index);
+
+	//if (userdata == NULL)
+	//	luaL_error(L, "invalid userdata");
+
+	//addr = (size_t)userdata[0][2];
+
+	//lua_obj obj(L, 1);
+	//lua_pushinteger(L, obj.getAddr());
+	//return 1;
+
+
+	luaL_checktype(L, 1, LUA_TUSERDATA);
+	void*** userdata = (void***)lua_touserdata(L, 1);
+
+	if (userdata == NULL)
+		luaL_error(L, "invalid userdata");
+
+	size_t addr = (size_t)userdata[0][2];
+	lua_pushinteger(L, addr);
+	return 1;
+}
+
 // Read functions - return the value at the given address
 int read_byte(lua_State* L) {
 	void* addr = (void*)luaL_checkinteger(L, 1);
@@ -271,6 +296,10 @@ void add_memory_functions(lua_State* L) {
 	if (!lua_istable(L, -1)) {
 		luaL_error(L, "add_memory_functions failed: parent table does not exist");
 	}
+
+	lua_pushstring(L, "getUserdataAddr");
+	lua_pushcfunction(L, get_userdata_addr);
+	lua_rawset(L, -3);
 
 	// Read functions
 	lua_pushstring(L, "readInt");

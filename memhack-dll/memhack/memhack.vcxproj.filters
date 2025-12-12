@@ -36,7 +36,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="security\safememory.cpp">
+    <ClCompile Include="safememory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="security\safememory.h">
+    <ClInclude Include="safememory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

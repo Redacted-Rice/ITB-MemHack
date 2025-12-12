@@ -1,11 +1,7 @@
-Add struct handling logic/framework
-Add tests/test support (see memedit?)
-Make things extensible (both struct defs and tests)
+Change to capitalize Get/Set defaults
+Change to use _ for hidden instead of custom prefix. Should sets be hidden by default unless exposed? Gets probably should be exposed so I'm leaning towards exposing sets as well
 
-Future:
-Integrate with -dll repo
-Write release and install instructions
-Create as a bundled extension folder to prepare for pilot skills ext as well
+Add tests/test support (see memedit?)
 Add dynamic scanning capabilities for all accessible memory (see memedit scan/scanner)
 	Include negate scans
 	Include value changed scans?

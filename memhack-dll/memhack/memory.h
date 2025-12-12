@@ -12,6 +12,8 @@
 // Maximum length for C string operations (including null terminator)
 const int MAX_CSTRING_LENGTH = 1024;
 
+int get_userdata_addr(lua_State* L);
+
 // Read functions - return the value at the given address
 int read_byte(lua_State* L);
 int read_int(lua_State* L);
