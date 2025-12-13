@@ -171,7 +171,7 @@ function Structure.init(dll, structs)
 end
 
 -- Capitalize first letter of a string
-local function capitalize(str)
+function Structure.capitalize(str)
 	return str:sub(1, 1):upper() .. str:sub(2)
 end
 
@@ -232,14 +232,32 @@ local function generatePointerGetters(StructType, fieldName, fieldDef, handler, 
 			-- Resolve the pointed type (string name to actual structure)
 			local pointedStruct = fieldDef.pointedType
 			if type(pointedStruct) == "string" then
-				pointedStruct = _structures[pointedStruct]
-				if not pointedStruct then
-					error(string.format("Unknown structure type: %s", fieldDef.pointedType))
+				-- support pointers to native types where appropriate
+				if pointedStruct == "pointer" or pointedStruct == "struct" then
+					error(string.format("structure type '%s' not supported", pointedStruct))
+				-- Types that need size
+				elseif pointedStruct == "string" or pointedStruct == "bytearray" then
+					if fieldDef.pointedSize == nil then
+						error(string.format("pointedType '%s' requires pointedSize", pointedStruct))
+					end
+					return TYPE_HANDLERS[pointedStruct].read(_dll, ptrValue, fieldDef.pointedSize)
+				-- unsupported types
+				-- native types like int, bool, etc
+				elseif TYPE_HANDLERS[pointedStruct] ~= nil then
+					return TYPE_HANDLERS[pointedStruct].read(_dll, ptrValue)
+				-- defined struct
+				else
+					pointedStruct = _structures[pointedStruct]
+					if not pointedStruct then
+						error(string.format("Unknown structure type: %s", fieldDef.pointedType))
+					end
+					-- Create and return wrapped structure
+					return pointedStruct.new(ptrValue)
 				end
 			end
 
-			-- Create and return wrapped structure
-			return pointedStruct.new(ptrValue)
+			error(string.format("Unknown structure type: %s", fieldDef.pointedType))
+			return nil
 		end
 	end
 end
@@ -317,7 +335,7 @@ end
 local function buildStructureMethods(StructType, layout)
 	-- Clear existing generated methods with any possible prefix
 	for fieldName, fieldDef in pairs(layout) do
-		local capitalizedName = capitalize(fieldName)
+		local capitalizedName = Structure.capitalize(fieldName)
 
 		-- Clear exposed prefixes
 		StructType[GETTER_PREFIX .. capitalizedName] = nil
@@ -336,7 +354,7 @@ local function buildStructureMethods(StructType, layout)
 
 	-- Generate getter and setter methods for each field
 	for fieldName, fieldDef in pairs(layout) do
-		local capitalizedName = capitalize(fieldName)
+		local capitalizedName = Structure.capitalize(fieldName)
 		local handler = TYPE_HANDLERS[fieldDef.type]
 
 		if fieldDef.type == "pointer" then
@@ -546,6 +564,21 @@ function Structure.array(structType, baseAddress, count, stride)
 	arr.baseAddress = baseAddress
 
 	return arr
+end
+
+-- Defines a Set<FieldName> function that
+-- wraps a Get<FieldName>:Set() fn.
+-- FieldName must be a struct type that defines
+-- a Set function
+-- fieldName does not need to be captialized
+function Structure.makeSetterWrapper(struct, fieldName)
+	local capitailized = Structure.capitalize(fieldName)
+	local funcName = "Set" .. capitailized
+	local getterName = "Get" .. capitailized
+
+	struct[funcName] = function(self, ...)
+		self[getterName](self):Set(...)
+	end
 end
 
 return Structure

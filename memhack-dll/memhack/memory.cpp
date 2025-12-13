@@ -6,6 +6,16 @@
 static bool READ_ONLY = false;
 static bool READ_WRITE = true;
 
+
+int max_cstring_length(lua_State* L) {
+	lua_pushinteger(L, MAX_CSTRING_LENGTH);
+	return 1;
+}
+
+int max_byte_array_length(lua_State* L) {
+	return 1;
+}
+
 // Misc memory functions
 int get_userdata_addr(lua_State* L) {
 	luaL_checktype(L, 1, LUA_TUSERDATA);
@@ -24,6 +34,11 @@ int alloc_cstring(lua_State* L) {
 	size_t len;
 	const char* src = luaL_checklstring(L, 1, &len);
 
+	if (len + 1 > MAX_CSTRING_LENGTH) {
+		luaL_error(L, "alloc_cstring failed: max_length cannot exceed %d (including null terminator), got %d", MAX_CSTRING_LENGTH, len + 1);
+		return 0;
+	}
+
 	char* raw = new char[len + 1];
 	std::memcpy(raw, src, len);
 	raw[len] = '\0';
@@ -32,6 +47,20 @@ int alloc_cstring(lua_State* L) {
 	return push_itb_userdata(L, owner, "UserdataMemhackCString");
 }
 
+int alloc_byte_array(lua_State* L) {
+	int length = luaL_checkinteger(L, 1);
+
+	if (length > MAX_BYTE_ARRAY_LENGTH) {
+		luaL_error(L, "alloc_byte_array failed: max_length cannot exceed %d, got %d", MAX_BYTE_ARRAY_LENGTH, length);
+		return 0;
+	}
+
+	unsigned char* raw = new unsigned char[length + 1];
+	std::memset(raw, 0, length);
+
+	auto* owner = new Owner<unsigned char[]>(raw);
+	return push_itb_userdata(L, owner, "UserdataMemhackByteArray");
+}
 
 // Read functions - return the value at the given address
 int read_byte(lua_State* L) {
@@ -298,6 +327,18 @@ void add_memory_functions(lua_State* L) {
 	if (!lua_istable(L, -1)) {
 		luaL_error(L, "add_memory_functions failed: parent table does not exist");
 	}
+
+	lua_pushstring(L, "MAX_CSTRING_LENGTH");
+	lua_pushinteger(L, MAX_CSTRING_LENGTH);
+	lua_rawset(L, -3);
+
+	lua_pushstring(L, "MAX_BYTE_ARRAY_LENGTH");
+	lua_pushinteger(L, MAX_BYTE_ARRAY_LENGTH);
+	lua_rawset(L, -3);
+
+	lua_pushstring(L, "getUserdataAddr");
+	lua_pushcfunction(L, get_userdata_addr);
+	lua_rawset(L, -3);
 
 	lua_pushstring(L, "getUserdataAddr");
 	lua_pushcfunction(L, get_userdata_addr);
